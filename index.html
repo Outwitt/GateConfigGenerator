@@ -72,20 +72,22 @@
             config.push(`"${type.value}"`);
             config.push(`"${target.value}"`);
 
-            const teamsData = String(allowedTeams.value).split(',');
+            const teamsData = String(allowedTeams.value).trim() == "" ? [] : String(allowedTeams.value).split(',');
             for(const index of Object.keys(teamsData))
             {
-                teamsData[index] = String(teamsData[index].trim());
+                teamsData[index] = `"${String(teamsData[index].trim())}"`;
             }
+            config.push(teamsData.length > 0 ? `[${teamsData.join(',')}]` : `null`);
 
-            const userIdsData = String(allowedUserIds.value).split(',');
+            const userIdsData = String(allowedUserIds.value).trim() == "" ? [] : String(allowedUserIds.value).split(',');
             for(const index of Object.keys(userIdsData))
             {
-                userIdsData[index] = String(userIdsData[index].trim());
+                userIdsData[index] = `"${String(userIdsData[index].trim())}"`;
             }
+            config.push(userIdsData.length > 0 ? `[${userIdsData.join(',')}]` : `null`);
 
-            if(Number(openDelay.value) > 0) config.push(`${openDelay.value}`);
-            if(Number(closeDelay.value) > 0) config.push(`${openDelay.value}`);
+            config.push(Number(openDelay.value) > 0 ? `${openDelay.value}` : `null`);
+            config.push(Number(closeDelay.value) > 0 ? `${closeDelay.value}` : `null`);
 
             config.push(assignableValue.checked);
             

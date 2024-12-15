@@ -87,7 +87,7 @@
             if(Number(openDelay.value) > 0) config.push(`${openDelay.value}`);
             if(Number(closeDelay.value) > 0) config.push(`${openDelay.value}`);
 
-            config.push(KnockingEnabled.checked);
+            config.push(assignableValue.checked);
             
             configData.innerText = `[${config.join(",")}]`
         })

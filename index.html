@@ -7,46 +7,39 @@
 
         <meta property = "og:type" content = "website">
 
-        <title>Door Config Generator</title>
+        <title>Gate Config Generator</title>
     </head>
 
     <body>
-        <h1>Door Configuration Generator</h1>
+        <h1>Gate Configuration Generator</h1>
         
         <label for="type">Type:</label>
         <input type="text" id="type" name="type">
         <br><br>
 
-        <input type="checkbox" id="maintainState" name="maintainState" value="maintainState">
-        <label for="maintainState"> MaintainState - Bypass Auto Close</label>
+        <label for="target">Target (VehicleDriver/Player):</label>
+        <input type="text" id="target" name="target">
         <br><br>
 
-        <input type="checkbox" id="batteringRamCompatible" name="batteringRamCompatible" value="batteringRamCompatible">
-        <label for="batteringRamCompatible"> batteringRamCompatible</label>
+        <label for="allowedTeams">Allowed Team Names (Seperate with ,):</label>
+        <input type="text" id="allowedTeams" name="allowedTeams">
         <br><br>
 
-        <h3>Lock Config</h3>
-        <input type="checkbox" id="LockingEnabled" name="LockingEnabled" value="LockingEnabled">
-        <label for="LockingEnabled"> LockingEnabled</label><br>
+        <label for="allowedUserIds">Allowed UserIds (Seperate with ,):</label>
+        <input type="text" id="allowedUserIds" name="allowedUserIds">
+        <br><br>
 
-        <input type="checkbox" id="DefaultLocked" name="DefaultLocked" value="DefaultLocked">
-        <label for="DefaultLocked"> DefaultLocked - Is Locked by Default</label><br>
-        
-        <label for="AutoLockAfter">AutoLockAfter (Seconds):</label>
-        <input type="text" id="AutoLockAfter" name="AutoLockAfter"><br>
+        <label for="openDelay">Open Delay:</label>
+        <input type="text" id="openDelay" name="openDelay">
+        <br><br>
 
-        <input type="checkbox" id="CloseDoorsOnAutoLock" name="CloseDoorsOnAutoLock" value="CloseDoorsOnAutoLock">
-        <label for="CloseDoorsOnAutoLock"> CloseDoorsOnAutoLock</label><br>
+        <label for="closeDelay">Close Delay:</label>
+        <input type="text" id="closeDelay" name="closeDelay">
+        <br><br>
 
-        <h3>Knocking Config</h3>
-        <input type="checkbox" id="KnockingEnabled" name="KnockingEnabled" value="KnockingEnabled">
-        <label for="KnockingEnabled"> KnockingEnabled</label><br>
-
-        <input type="checkbox" id="CanKnockWhenUnlocked" name="CanKnockWhenUnlocked" value="CanKnockWhenUnlocked">
-        <label for="CanKnockWhenUnlocked"> CanKnockWhenUnlocked</label><br>
-        
-        <label for="KnockCooldown">KnockCooldown (Seconds):</label>
-        <input type="text" id="KnockCooldown" name="KnockCooldown"><br><br>
+        <input type="checkbox" id="assignableValue" name="assignableValue" value="assignableValue">
+        <label for="assignableValue"> Assignable Value</label>
+        <br><br>
 
         <button id="generateConfig">Generate</button>
         <button id="clearConfig">Clear</button>
@@ -56,17 +49,12 @@
 
     <script>
         const type = document.querySelector("#type");
-        const maintainState = document.querySelector("#maintainState");
-        const batteringRamCompatible = document.querySelector("#batteringRamCompatible");
-
-        const LockingEnabled = document.querySelector("#LockingEnabled");
-        const DefaultLocked = document.querySelector("#DefaultLocked");
-        const AutoLockAfter = document.querySelector("#AutoLockAfter");
-        const CloseDoorsOnAutoLock = document.querySelector("#CloseDoorsOnAutoLock");
-
-        const KnockingEnabled = document.querySelector("#KnockingEnabled");
-        const CanKnockWhenUnlocked = document.querySelector("#CanKnockWhenUnlocked");
-        const KnockCooldown = document.querySelector("#KnockCooldown");
+        const target = document.querySelector("#target");
+        const allowedTeams = document.querySelector("#allowedTeams");
+        const allowedUserIds = document.querySelector("#allowedUserIds");
+        const openDelay = document.querySelector("#openDelay");
+        const closeDelay = document.querySelector("#closeDelay");
+        const assignableValue = document.querySelector("#assignableValue");
 
         const generateConfig = document.querySelector("#generateConfig");
         const clearConfig = document.querySelector("#clearConfig");
@@ -74,32 +62,44 @@
 
         generateConfig.addEventListener("click", function() {
             if(String(type.value).trim() == "") {
-                return alert("Type is Required")
+                return alert("Type is Required");
             }
-            var config = []
-            config.push(`"${type.value}"`)
-            config.push(String(maintainState.checked))
-            config.push(String(batteringRamCompatible.checked))
-            config.push(LockingEnabled.checked == true ? `[${String(DefaultLocked.checked)},${String(AutoLockAfter.value).trim() == "" ? "null" : AutoLockAfter.value}, ${String(CloseDoorsOnAutoLock.checked)}]` : "null")
-            config.push(KnockingEnabled.checked == true ? `[${String(CanKnockWhenUnlocked.checked)},${String(KnockCooldown.value).trim() == "" ? "null" : KnockCooldown.value}]` : "null")
-            console.log(config)
+            if(String(target.value).trim() == "") {
+                return alert("Target is Required");
+            }
+
+            var config = [];
+            config.push(`"${type.value}"`);
+            config.push(`"${target.value}"`);
+
+            const teamsData = String(allowedTeams.value).split(',');
+            for(const index of Object.keys(teamsData))
+            {
+                teamsData[index] = String(teamsData[index].trim());
+            }
+
+            const userIdsData = String(allowedUserIds.value).split(',');
+            for(const index of Object.keys(userIdsData))
+            {
+                userIdsData[index] = String(userIdsData[index].trim());
+            }
+
+            if(Number(openDelay.value) > 0) config.push(`${openDelay.value}`);
+            if(Number(closeDelay.value) > 0) config.push(`${openDelay.value}`);
+
+            config.push(KnockingEnabled.checked);
+            
             configData.innerText = `[${config.join(",")}]`
         })
 
         clearConfig.addEventListener("click", function() {
             type.value = ""
-            maintainState.checked = false;
-            batteringRamCompatible.checked = false;
-
-            LockingEnabled.checked = false;
-            DefaultLocked.checked = false;
-            AutoLockAfter.value = ""
-            CloseDoorsOnAutoLock.checked = false;
-
-            KnockingEnabled.checked = false;
-            CanKnockWhenUnlocked.checked = false;
-            KnockCooldown.value = ""
-
+            target.value = ""
+            allowedTeams.value = ""
+            allowedUserIds.value = ""
+            openDelay.value = ""
+            closeDelay.value = ""
+            assignableValue.checked = false;
             configData.innerText = ""
         })
     </script>
